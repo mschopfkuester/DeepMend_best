@@ -1,0 +1,36 @@
+# Virtual environmnet
+env
+
+# 3rd party libraries
+libs
+
+# Python files
+*.pyc
+*__pycache__
+
+# Machine-specific constants
+constants.sh
+
+# All temp files
+*temp*
+
+# Experiments directory
+deepmend/experiments*
+deepmend/logger_Reconstruction*
+deepmend/object_no_4*
+deepmend/Reconstruction*
+deepmend/train_original*
+deepmend/example_files*
+own_code*
+
+
+
+
+# Baslines
+other/3do/env
+other/3do/libs
+other/pointnet/env
+other/pointnet/log
+other/deepsdf/experiments*
+
+.git_old

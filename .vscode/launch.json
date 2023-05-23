@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Aktuelle Datei",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/deepmend",
+            "program": "python/train_or.py",
+            "env": {
+                "PYTHONPATH": "../fracturing",
+                "DATADIR": "/home/michael/Projects/test_shapeNet/ShapeNet"  
+            },
+            "args": ["-e", 
+            "experiments/cars", 
+            "--batch_split=10"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        }
+    ]
+}

@@ -152,8 +152,8 @@ class Decoder(nn.Module):
 
         self._ones = None
 
-        for name, param in self.named_parameters():
-            print(f"{name}: {param.numel()}")
+        #for name, param in self.named_parameters():
+        #    print(f"{name}: {param.numel()}")
 
 
         

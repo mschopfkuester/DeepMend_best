@@ -45,33 +45,36 @@ from reconstruct_2 import reconstruct as reconstruct
 
 #experiment_dir=os.path.join('experiments','mugs')
 
+STATUS_INDICATOR = None
+STATUS_COUNTER = 0
 
-def main(k_obj,datadir_1,datadir_2,train_test_file):
+
+def main(k_obj,datadir_1,datadir_2,train_test_file,class_obj,path_model):
     path_deepmend=os.getcwd()
 
     f=open(train_test_file)
     test_dict=json.load(f)['id_test_list']
 
-    experiment_dir=os.path.join('experiments','mugs')
+    experiment_dir=os.path.join('experiments',class_obj)
 
 
 
     for k,id in enumerate(test_dict[:]):
         print((k,id))
-        if k<k_obj:
-            continue
-        elif k>k_obj:
-            break
+        #if k<k_obj:
+        #    continue
+        #elif k>k_obj:
+        #    break
         ##### create dictionary/json file and save it in corresponding file
-        json_dict='/home/michael/Projects/test_shapeNet/ShapeNet/ShapeNetCore.v2/mugs_split_single_{}.json'.format(k)
+        json_dict=os.path.join(datadir_1, '{}_split_single_{}.json'.format(class_obj,k))
         d={"id_train_list": [id],"id_test_list": [id]}
         with open(json_dict, 'w') as fp:
             json.dump(d, fp)
 
         #####create pickle file 
 
-        outfile_train=os.path.join(datadir_1,'mugs_train_single_{}.pkl'.format(k))
-        outfile_test=os.path.join(datadir_1,'mugs_test_single_{}.pkl'.format(k))
+        outfile_train=os.path.join(datadir_1,'{}_train_single_{}.pkl'.format(class_obj,k))
+        outfile_test=os.path.join(datadir_1,'{}_test_single_{}.pkl'.format(class_obj,k))
         build_pickle(datadir_1,
                     outfile_train,
                     None,
@@ -85,9 +88,15 @@ def main(k_obj,datadir_1,datadir_2,train_test_file):
                     False,
                     False,
                     skip_ask_overwirite=True)
+
+        json_dict=os.path.join(datadir_2, '{}_split_single_{}.json'.format(class_obj,k))
+        d={"id_train_list": [id],"id_test_list": [id]}
+        #print(d)
+        with open(json_dict, 'w') as fp:
+            json.dump(d, fp)
         
-        outfile_train_2=os.path.join(datadir_2,'mugs_train_single_{}.pkl'.format(k))
-        outfile_test_2=os.path.join(datadir_2,'mugs_test_single_{}.pkl'.format(k))
+        outfile_train_2=os.path.join(datadir_2,'{}_train_single_{}.pkl'.format(class_obj,k))
+        outfile_test_2=os.path.join(datadir_2,'{}_test_single_{}.pkl'.format(class_obj,k))
 
         build_pickle(datadir_2,
                     outfile_train_2,
@@ -105,11 +114,12 @@ def main(k_obj,datadir_1,datadir_2,train_test_file):
         
         
         ###### Load model and latent codes
-        model=torch.load('/home/michael/Projects/DeepMend_changes3/deepmend/experiments/mugs/ModelParameters/latest.pth')
-        torch.save(model,os.path.join(path_deepmend,'experiments','mugs','ModelParameters/begin_{}.pth'.format(k)))
+        #print(path_model)
+        model=torch.load(path_model)#torch.load('/home/michael/Projects/DeepMend_changes3/deepmend/experiments/mugs/ModelParameters/latest.pth')
+        torch.save(model,os.path.join(path_deepmend,'experiments',class_obj,'ModelParameters/begin_{}.pth'.format(k)))
 
-        shutil.copy(os.path.join(path_deepmend,'experiments','mugs','LatentCodesInference1','{}.pth'.format(k)),os.path.join(path_deepmend,'experiments','mugs','LatentCodes','begin_{}.pth'.format(k)))
-        shutil.copy(os.path.join(path_deepmend,'experiments','mugs','LatentCodesInference1','{}_tool.pth'.format(k)),os.path.join(path_deepmend,'experiments','mugs','LatentCodes','begin_{}_tool.pth').format(k))
+        shutil.copy(os.path.join(path_deepmend,'experiments',class_obj,'LatentCodesInference1','{}.pth'.format(k)),os.path.join(path_deepmend,'experiments',class_obj,'LatentCodes','begin_{}.pth'.format(k)))
+        shutil.copy(os.path.join(path_deepmend,'experiments',class_obj,'LatentCodesInference1','{}_tool.pth'.format(k)),os.path.join(path_deepmend,'experiments',class_obj,'LatentCodes','begin_{}_tool.pth').format(k))
 
 
         
@@ -117,8 +127,9 @@ def main(k_obj,datadir_1,datadir_2,train_test_file):
 
 
         ######Train model with all weights
-        train_source_path=os.path.join(datadir_2,'mugs_train_single_{}.pkl'.format(k))
+        train_source_path=os.path.join(datadir_2,'{}_train_single_{}.pkl'.format(class_obj,k))
 
+        #print('begin_{}'.format(k))
         train(experiment_dir,
             'begin_{}'.format(k),
             1,
@@ -129,11 +140,11 @@ def main(k_obj,datadir_1,datadir_2,train_test_file):
         #####load model weights in right file for inference/shape creation
 
         #load model weights in modelparameters and save under 'inference'
-        shutil.copy(os.path.join(path_deepmend,'experiments','mugs','ModelInference','{}_model.pth'.format(k)),os.path.join(path_deepmend,'experiments','mugs','ModelParameters','inference_{}.pth'.format(k)))
+        shutil.copy(os.path.join(path_deepmend,'experiments',class_obj,'ModelInference','{}_model.pth'.format(k)),os.path.join(path_deepmend,'experiments',class_obj,'ModelParameters','inference_{}.pth'.format(k)))
 
         #load latent codes directly via optional parameter in function
-        latent_path=os.path.join(path_deepmend,'experiments','mugs','ModelInference','{}_lat.pth'.format(k))
-        tool_latent_path=os.path.join(path_deepmend,'experiments','mugs','ModelInference','{}_tool_lat.pth'.format(k))
+        latent_path=os.path.join(path_deepmend,'experiments',class_obj,'ModelInference','{}_lat.pth'.format(k))
+        tool_latent_path=os.path.join(path_deepmend,'experiments',class_obj,'ModelInference','{}_tool_lat.pth'.format(k))
 
         
         #####inference for one object
@@ -231,7 +242,7 @@ def main(k_obj,datadir_1,datadir_2,train_test_file):
             signiture=[],
         )
         sdf_dataset = core.data.SamplesDataset(
-            os.path.join(datadir_1,'mugs_test_single_{}.pkl'.format(k)), #test_split_file,
+            os.path.join(datadir_1,'{}_test_single_{}.pkl'.format(class_obj,k)), #test_split_file,
             subsample=num_samples,
             uniform_ratio=uniform_ratio,
             use_occ=specs["UseOccupancy"],
@@ -327,9 +338,9 @@ def main(k_obj,datadir_1,datadir_2,train_test_file):
                                     )
             
 
-        shutil.copy(os.path.join(path_deepmend,experiment_dir,'Reconstructions','ours_@inference_{}'.format(k),'Meshes','0_0_.obj'),os.path.join(path_deepmend,experiment_dir,'Reconstructions_all_2','{}_0_.obj'.format(k)))
-        shutil.copy(os.path.join(path_deepmend,experiment_dir,'Reconstructions','ours_@inference_{}'.format(k),'Meshes','0_1_.obj'),os.path.join(path_deepmend,experiment_dir,'Reconstructions_all_2','{}_1_.obj'.format(k)))
-        shutil.copy(os.path.join(path_deepmend,experiment_dir,'Reconstructions','ours_@inference_{}'.format(k),'Meshes','0_2_.obj'),os.path.join(path_deepmend,experiment_dir,'Reconstructions_all_2','{}_2_.obj'.format(k)))
+        shutil.copy(os.path.join(path_deepmend,experiment_dir,'Reconstructions','ours_@inference_{}'.format(k),'Meshes','0_0_.obj'),os.path.join(path_deepmend,experiment_dir,'Reconstructions_end','{}_0_.obj'.format(k)))
+        shutil.copy(os.path.join(path_deepmend,experiment_dir,'Reconstructions','ours_@inference_{}'.format(k),'Meshes','0_1_.obj'),os.path.join(path_deepmend,experiment_dir,'Reconstructions_end','{}_1_.obj'.format(k)))
+        shutil.copy(os.path.join(path_deepmend,experiment_dir,'Reconstructions','ours_@inference_{}'.format(k),'Meshes','0_2_.obj'),os.path.join(path_deepmend,experiment_dir,'Reconstructions_end','{}_2_.obj'.format(k)))
 
 
         #break
@@ -349,6 +360,7 @@ if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser(description="Retrain all objects")
     arg_parser.add_argument(
         "--k",
+        type=int,
         default=0,
     )
     
@@ -367,6 +379,16 @@ if __name__ == "__main__":
         default='/home/michael/Projects/test_shapeNet/ShapeNet/ShapeNetCore.v2/split_original/mugs_split.json',
     )
 
+    arg_parser.add_argument(
+        "--object_class",
+        default='mugs',
+    )
+
+    arg_parser.add_argument(
+        "--path_model",
+        default='/home/michael/model/latest',
+    )
+
 
     #datadir_1="/home/michael/Projects/test_shapeNet/ShapeNet/ShapeNetCore.v2"
     #datadir_2="/home/michael/Projects/test_shapeNet_inference2/ShapeNet/ShapeNetCore.v2"
@@ -378,4 +400,5 @@ if __name__ == "__main__":
     #test_dict=json.load(f)['id_test_list']
 
     #experiment_dir=os.path.join('experiments','mugs')
-    main(arg_parser.k_obj,arg_parser.datadir_1,arg_parser.datadir_2,arg_parser.train_test_file)
+    args = arg_parser.parse_args()
+    main(args.k,args.datadir_1,args.datadir_2,args.train_test_file,args.object_class,args.path_model)

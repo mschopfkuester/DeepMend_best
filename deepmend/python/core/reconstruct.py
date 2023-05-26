@@ -115,7 +115,7 @@ def decode_samples(vec, decoder, pts, use_net=1, batch_size=2 ** 16, sigmoid=Tru
         if sigmoid:
             values = torch.sigmoid(values)
         value_accumulator.append(values.detach().cpu().numpy())
-    values = np.vstack(value_accumulator).astype(np.float)
+    values = np.vstack(value_accumulator).astype(float)
 
     return values
 

@@ -24,7 +24,7 @@ import core.workspace as ws
 
 from collections import defaultdict
 
-import hydra
+#import hydra
 
 import torch.utils.tensorboard
 

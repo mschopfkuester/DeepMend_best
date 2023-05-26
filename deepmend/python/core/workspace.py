@@ -34,6 +34,7 @@ def load_model_parameters(experiment_directory, checkpoint, decoder):
     filename = os.path.join(
         experiment_directory, model_params_subdir, checkpoint + ".pth"
     )
+    #print(filename)
     if not os.path.isfile(filename):
         raise Exception('model state dict "{}" does not exist'.format(filename))
     data = torch.load(filename)
